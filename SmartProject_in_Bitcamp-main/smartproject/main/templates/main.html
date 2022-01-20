@@ -1,0 +1,169 @@
+{% load static %}
+<!--<!DOCTYPE html>-->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>FinanceDoctor</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/wordcloud.js"></script>
+</head>
+
+<!-- 조회하면 show 클래스입니다.  -->
+<body class="{% if testState == '1' %} show {% else %} hide {% endif %}">
+
+<header id="pageHeader">
+  <a href="{% url 'main' %}">
+    <img src="{% static 'img/logo.PNG' %}" />
+  </a>
+  <div class="headerText">Finance Doctor</div>
+</header>
+
+<nav id="mainNav" class="row">
+  <div class="row">
+    <!-- 테마 선택 -->
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      {% comment %} <div class="">테마선택</div> {% endcomment %}
+      <div class="input-group mb-3" style="padding-top: 0;">
+        <select class="custom-select" id="theme" onchange="addressKindChange(this)">
+          <option value="0000" selected>테마를 선택하세요</option>
+          <option value="game">게임</option>
+          <option value="realEstate">부동산</option>
+          <option value="broadCast">방송사</option>
+          <option value="sea">해운</option>
+          <option value="pharmaceutical">제약사</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 회사 선택 -->
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      {% comment %} <div class="">회사선택</div> {% endcomment %}
+      <div class="input-group mb-3" style="padding-top: 0;">
+        <select class="custom-select" id="company">
+          <option value="0000" selected>회사를 선택하세요</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 모델 선택 -->
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      {% comment %} <div class="">모델선택</div> {% endcomment %}
+      <div class="input-group mb-3" style="padding-top: 0;">
+        <select class="custom-select" id="model">
+          <option value="0000">모델을  선택하세요</option>
+          <option value="lstm">LSTM</option>
+          <option value="prophet">PROPHET</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 예측기간 선택 -->
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      {% comment %} <div class="">예측기간 선택</div> {% endcomment %}
+      <div class="input-group mb-3" style="padding-top: 0;">
+        <select class="custom-select" id="predictTerm">
+          <option value="0000">예측기간 선택하세요</option>
+          <option value="5">5일</option>
+          <option value="30">30일</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="mainNavBtn" class="d-flex justify-content-center" style="width: 100%;">
+      <div class="col-md-6">
+        <button type="button" class="btn btn-success" onclick="handleClickChoose()">예측 시작!</button>
+        </div>
+        <div class="col-md-6">
+        <button type="button" class="btn btn-dark" onclick="handleClickReset()">Reset</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<article id="mainArticle" class="row">
+  <div class="testerWrap col-sm-12 col-md-6">
+    <!-- 종목명 -->
+    <div class="companyName"><h4 style="font-weight: bold;">{{ company_name }} 주가</h4></div>
+
+    <!-- 차트 -->
+    <div id="tester"></div>
+    <script>
+      var True = true, FALSE = false;
+      TESTER = document.getElementById('tester');
+      Plotly.newPlot( TESTER,
+        {{ chart | safe}}
+      );
+    </script>
+
+    <!-- 예측가, 정확도 -->
+    <div class="descriptionWrap">
+      <h5>시계열분석 결과</h5>
+      <div class="description">{{ cost }}</div>
+      <div class="description">{{ accuracy }}</div>
+    </div>
+  </div>
+
+  <!-- 워드클라우드 -->
+  <div class="col-sm-12 col-md-6">
+  <div class="companyName"><h4 style="font-weight: bold;">{{ company_name }} 기사</h4></div>
+    <div id="container"></div>
+    <script>
+      var data = [
+      {% for word in wordcloud %}
+      {
+        name: "{{ word.x }}",
+        weight: {{ word.value }}
+      },
+      {% endfor %}
+      ];
+      data.forEach(function(el) {
+        if (el.weight < 3) {
+            el.weight += 2;
+        }
+      })
+      Highcharts.chart("container", {
+        plotOptions: {
+          series: {
+            cursor: 'pointer',
+            point: {
+              events: {
+                click: function() {
+                  window.open('https://search.naver.com/search.naver?query={{ company_name }}&where=news&ie=utf8&sm=nws_hty')
+                }
+              }
+            }
+          }
+        },
+        series: [{
+          type: "wordcloud",
+          data: data,
+          name: "Frequencies",
+          rotation: {
+            from: 0,
+            to: 0
+          }
+        }],
+        title: {
+          text: ""
+        }
+      });
+    </script>
+
+    <!-- 주가예측, 정확도 -->
+    <div class="descriptionWrap">
+      <h5>감성분석 결과</h5>
+      <div class="description">{{ sentiment.result }}</div>
+      <div class="description">{{ sentiment.accuracy }}</div>
+    <div>
+  </div>
+</article>
+
+<!--<footer id="pageFooter">Footer</footer>-->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

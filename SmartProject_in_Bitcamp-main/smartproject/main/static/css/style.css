@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+* {
+  font-size: 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+header, footer, article, nav {
+  padding: 0px;
+}
+body {
+  font-family: 'Noto Sans KR';
+  background: #f1f1f1;
+}
+header, footer, article, nav {
+  padding: 1.2em;
+  background: #f4f4f4;
+}
+#pageHeader {
+  grid-area: header;
+  position: absolute;
+  top: 27vh;
+  width: 100%;
+}
+#pageHeader img {
+  width: 70px;
+  height: 70px;
+}
+#pageHeader > div.headerText {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 40px;
+  font-weight: bold;
+}
+#pageFooter {
+  grid-area: footer;
+}
+
+/* 네비게이션 (테마, 회사 선택) */
+#mainNav {
+  grid-area: nav;
+  height: 100vh;
+  transition: 1.5s;
+  transition: 1.5s;
+}
+
+#mainNav > div {
+  width: 90%;
+  max-width: 1000px;
+  margin: auto;
+}
+#mainNavBtn {
+  width: 100%;
+}
+#mainNavBtn button {
+  width: 100%;
+}
+
+/* 메인 (모델 (Lstm,fbprophet), 자연어(nlp) 정보) */
+#mainArticle {
+  padding: 0px;
+  grid-area: article;
+  display: none;
+}
+
+/*  */
+.companyName {
+  font-size: 17px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.descriptionWrap {
+  position: absolute;
+  bottom: 10px;
+  width: 90%;
+  left: 5%;
+}
+
+#mainArticle > div {
+  padding: 10px;
+  padding-bottom: 100px;
+}
+
+#mainArticle .testerWrap.col-md-6 {
+  border-right: 1px solid gainsboro;
+}
+
+/* 조회 되면 변화하는 스타일 정의 */
+body.show #mainNav {
+  grid-area: nav;
+  min-height: 20vh;
+  height: auto;
+  padding-top: 100px;
+  padding-bottom: 5vh;
+  transition: 1.5s;
+}
+
+body.show #pageHeader {
+  top: 0px;
+}
+
+body.show #mainArticle {
+  display: flex;
+  width: 90%;
+  max-width: 1300px;
+  margin: auto;
+}
+
+.description {
+  min-height: 35px;
+  font-size: 16px;
+  padding: 5px 10px;
+  background-color: #f1f1f1;
+  margin-bottom: 4px;
+}
+
+/* Stack the layout on small devices/viewports. */
+@media all and (max-width: 575px) {
+  body {
+    grid-template-areas:
+      "header"
+      "article"
+      "nav"
+      "footer";
+    grid-template-rows: 80px 1fr 70px 1fr 70px;
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-label{
+  padding: 0 1.2em;
+}
+
+header{
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 80px;
+  padding: 0;
+}
+
+article {
+  background-color: rgb(255, 255, 255);
+}
